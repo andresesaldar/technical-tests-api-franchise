@@ -39,4 +39,33 @@ class ProductRepositoryAdapterTest {
                 .verifyComplete();
     }
 
+    @Test
+    void shouldExistsBySlugAndBranchId() {
+        final String slug = "test-slug";
+        final String branchId = "branch-123";
+
+        when(repository.existsBySlugAndBranchId(anyString(), anyString()))
+                .thenReturn(Mono.just(true));
+
+        StepVerifier.create(adapter.existsBySlugAndBranchId(slug, branchId))
+                .expectNext(true)
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldDelete() {
+        final String slug = "test-slug";
+        final String branchId = "branch-123";
+        final Product product = Product.builder()
+                .slug(slug)
+                .branchId(branchId)
+                .build();
+
+        when(repository.delete(product))
+                .thenReturn(Mono.empty());
+
+        StepVerifier.create(adapter.delete(product))
+                .verifyComplete();
+    }
+
 }

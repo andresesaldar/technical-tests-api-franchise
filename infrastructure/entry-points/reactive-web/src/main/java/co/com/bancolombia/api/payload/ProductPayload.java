@@ -9,19 +9,20 @@ import lombok.extern.jackson.Jacksonized;
 @Value
 @Builder
 @Jacksonized
-public class FranchisePayload {
+public class ProductPayload {
     String slug;
     String name;
+    Long stock;
 
     @ApiResponse
     @Tag(name = "ResponsePayload<FranchisePayload>")
-    public static class Response extends ResponsePayload<FranchisePayload> {
-        public Response(FranchisePayload data) {
+    public static class Response extends ResponsePayload<ProductPayload> {
+        public Response(ProductPayload data) {
             super(data);
         }
     }
 
-    public FranchisePayload.Response response() {
-        return new FranchisePayload.Response(this);
+    public ProductPayload.Response response() {
+        return new ProductPayload.Response(this);
     }
 }

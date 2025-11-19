@@ -10,4 +10,5 @@ public interface BranchDBRepository extends ReactiveMongoRepository<Branch, Stri
     Mono<Boolean> existsBySlug(String slug);
     Mono<Boolean> existsBySlugAndFranchiseId(String slug, String franchiseId);
     Flux<Branch> findByFranchiseId(String franchiseId);
+    Mono<Branch> findBySlugAndFranchiseId(String slug, String franchiseId);
 }

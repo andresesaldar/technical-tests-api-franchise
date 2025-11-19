@@ -31,6 +31,11 @@ public class BranchRepositoryAdapter
     }
 
     @Override
+    public Mono<Branch> findBySlugAndFranchiseId(String slug, String franchiseId) {
+        return repository.findBySlugAndFranchiseId(slug, franchiseId);
+    }
+
+    @Override
     public Mono<Boolean> existsBySlugAndFranchiseId(String slug, String franchiseId) {
         return repository.existsBySlugAndFranchiseId(slug, franchiseId);
     }

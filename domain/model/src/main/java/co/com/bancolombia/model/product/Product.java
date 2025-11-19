@@ -15,4 +15,5 @@ public class Product {
     private String slug;
     private String name;
     private Long stock;
+    private String branchId;
 }

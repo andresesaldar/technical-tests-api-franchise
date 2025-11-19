@@ -1,7 +1,6 @@
 package co.com.bancolombia.mongo;
 
 import co.com.bancolombia.model.branch.Branch;
-import co.com.bancolombia.model.franchise.Franchise;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -63,6 +62,23 @@ class BranchRepositoryAdapterTest {
 
         StepVerifier.create(adapter.existsBySlugAndFranchiseId(slug, franchiseId))
                 .expectNext(true)
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldFindBySlugAndFranchiseId() {
+        final String slug = "test-slug";
+        final String franchiseId = "franchise-123";
+        final Branch branch = Branch.builder()
+                .slug(slug)
+                .franchiseId(franchiseId)
+                .build();
+
+        when(repository.findBySlugAndFranchiseId(anyString(), anyString()))
+                .thenReturn(Mono.just(branch));
+
+        StepVerifier.create(adapter.findBySlugAndFranchiseId(slug, franchiseId))
+                .expectNext(branch)
                 .verifyComplete();
     }
 

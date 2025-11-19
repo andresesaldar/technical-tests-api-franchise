@@ -1,9 +1,5 @@
 package co.com.bancolombia.model.franchise;
-import co.com.bancolombia.model.branch.Branch;
 import lombok.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Setter
@@ -14,6 +10,4 @@ public class Franchise {
     private String id;
     private String slug;
     private String name;
-    @Builder.Default
-    private List<Branch> branches = new ArrayList<>();
 }

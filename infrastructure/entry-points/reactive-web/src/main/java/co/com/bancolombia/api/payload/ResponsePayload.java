@@ -16,4 +16,11 @@ public class ResponsePayload<T> {
         this.data = data;
         this.success = true;
     }
+
+    public static class OkResponse extends ResponsePayload<Boolean> {
+
+        public OkResponse() {
+            super(true);
+        }
+    }
 }

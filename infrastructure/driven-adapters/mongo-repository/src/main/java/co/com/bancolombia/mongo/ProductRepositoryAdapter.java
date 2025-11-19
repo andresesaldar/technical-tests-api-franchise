@@ -23,4 +23,19 @@ public class ProductRepositoryAdapter
     public Mono<Product> findBySlug(String slug) {
         return repository.findBySlug(slug);
     }
+
+    @Override
+    public Mono<Boolean> existsBySlugAndBranchId(String slug, String branchId) {
+        return repository.existsBySlugAndBranchId(slug, branchId);
+    }
+
+    @Override
+    public Mono<Product> findBySlugAndBranchId(String slug, String branchId) {
+        return repository.findBySlugAndBranchId(slug, branchId);
+    }
+
+    @Override
+    public Mono<Void> delete(Product product) {
+        return repository.delete(product);
+    }
 }
