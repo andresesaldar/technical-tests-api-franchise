@@ -3,6 +3,7 @@
 <img src="ER_DIAGRAM.png" alt="ER Diagram" style="max-height:400px; width:auto;" />
 
 ## USING MAPPER
+## Slug instead of ID
 
 ## Antes de Iniciar
 

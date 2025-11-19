@@ -1,5 +1,6 @@
 package co.com.bancolombia.api;
 import co.com.bancolombia.api.input.UpdateProductStockInput;
+import co.com.bancolombia.api.mapper.ProductMapper;
 import co.com.bancolombia.api.route.API_REST_ROUTES;
 import co.com.bancolombia.usecase.product.ProductUseCase;
 import co.com.bancolombia.api.payload.UpdateProductStockPayload;
@@ -17,6 +18,7 @@ import reactor.core.publisher.Mono;
 @Tag(name = "Product API REST")
 public class ProductApiRest {
     private final ProductUseCase productUseCase;
+    private final ProductMapper productMapper;
 
     @PutMapping(path = API_REST_ROUTES.SLUG_PARAM + API_REST_ROUTES.STOCK)
     @Operation(summary = "Update product stock by slug")
@@ -25,7 +27,7 @@ public class ProductApiRest {
             @RequestBody @Valid UpdateProductStockInput input
             ) {
         return productUseCase.updateProductStock(slug, input.getStock())
-                .map(UpdateProductStockPayload::from)
+                .map(productMapper::toUpdateProductStockPayload)
                 .map(UpdateProductStockPayload::response);
     }
 }

@@ -24,7 +24,7 @@ class MongoConfigTest {
 
     @Test
     void dbSecretTest() {
-        final MongoDBSecret result = mongoConfigUnderTest.dbSecret("uri");
+        final MongoDBSecret result = mongoConfigUnderTest.dbSecret("uri", "test");
 
         assertEquals("uri", result.getUri());
     }
