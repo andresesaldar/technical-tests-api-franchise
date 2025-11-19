@@ -23,4 +23,9 @@ public class FranchiseRepositoryAdapter
     public Mono<Boolean> existsBySlug(String slug) {
         return repository.existsBySlug(slug);
     }
+
+    @Override
+    public Mono<Franchise> findBySlug(String slug) {
+        return repository.findBySlug(slug);
+    }
 }

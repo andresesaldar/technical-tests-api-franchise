@@ -6,4 +6,5 @@ import reactor.core.publisher.Mono;
 public interface FranchiseRepository {
     Mono<Franchise> save(Franchise franchise);
     Mono<Boolean> existsBySlug(String slug);
+    Mono<Franchise> findBySlug(String slug);
 }

@@ -1,8 +1,8 @@
 package co.com.bancolombia.api.handler;
 
-import co.com.bancolombia.api.payload.BusinessErrorPayload;
 import co.com.bancolombia.api.payload.ErrorPayload;
-import co.com.bancolombia.error.InvalidParamException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,10 +12,14 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestControllerAdvice
 public class CommonErrorHandler {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommonErrorHandler.class);
     private static final String UNEXPECTED_ERROR_OCCURRED = "Unexpected error occurred";
 
     @ExceptionHandler(Exception.class)
     ResponseEntity<ErrorPayload> handleCommonException(Exception ex) {
+
+        LOGGER.error("[CommonError]: ", ex);
+
         final Integer statusCode = ex instanceof HttpStatusCodeException
                 ? ((HttpStatusCodeException) ex).getStatusCode().value()
                 : ex instanceof ResponseStatusException
@@ -30,7 +34,7 @@ public class CommonErrorHandler {
 
 
         return ResponseEntity
-            .badRequest()
+            .internalServerError()
             .body(
                 ErrorPayload.builder()
                     .status(statusCode)

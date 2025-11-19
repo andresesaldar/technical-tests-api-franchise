@@ -2,6 +2,7 @@ package co.com.bancolombia.usecase.franchise;
 
 import co.com.bancolombia.error.InvalidParamError;
 import co.com.bancolombia.error.InvalidParamException;
+import co.com.bancolombia.model.branch.gateways.BranchRepository;
 import co.com.bancolombia.model.franchise.Franchise;
 import co.com.bancolombia.model.franchise.gateways.FranchiseRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -19,6 +21,9 @@ import static org.mockito.Mockito.when;
 class FranchiseUseCaseTest {
     @Mock
     FranchiseRepository franchiseRepository;
+
+    @Mock
+    BranchRepository branchRepository;
 
     @InjectMocks
     FranchiseUseCase franchiseUseCase;
@@ -66,6 +71,28 @@ class FranchiseUseCaseTest {
                                 throwable.getMessage().equals(InvalidParamError.INVALID_FRANCHISE_SLUG.getMessage())
                 )
                 .verify();
+    }
+
+    @Test
+    void shouldGetBySlug() {
+        final String slug = "test-franchise";
+        final String franchiseId = "franchise-123";
+        final Franchise franchise = Franchise.builder()
+                .slug(slug)
+                .id(franchiseId)
+                .build();
+
+        when(branchRepository.findByFranchiseId(anyString()))
+                .thenReturn(Flux.empty());
+
+        when(franchiseRepository.findBySlug(anyString()))
+                .thenReturn(Mono.just(franchise));
+
+        Mono<Franchise> result = franchiseUseCase.getBySlug(slug);
+
+        StepVerifier.create(result)
+                .expectNext(franchise)
+                .verifyComplete();
     }
 
 }

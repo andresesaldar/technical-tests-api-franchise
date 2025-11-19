@@ -1,5 +1,6 @@
 package co.com.bancolombia.mongo;
 
+import co.com.bancolombia.model.franchise.Franchise;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -32,6 +33,21 @@ class FranchiseRepositoryAdapterTest {
 
         StepVerifier.create(adapter.existsBySlug(slug))
                 .expectNext(true)
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldFindBySlug() {
+        final String slug = "test-slug";
+        final Franchise franchise = Franchise.builder()
+                .slug(slug)
+                .build();
+
+        when(repository.findBySlug(anyString()))
+                .thenReturn(Mono.just(franchise));
+
+        StepVerifier.create(adapter.findBySlug(slug))
+                .expectNext(franchise)
                 .verifyComplete();
     }
 }

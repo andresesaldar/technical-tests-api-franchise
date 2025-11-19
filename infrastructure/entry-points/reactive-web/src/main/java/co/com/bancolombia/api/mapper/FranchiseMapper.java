@@ -9,7 +9,8 @@ import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring",
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL,
-        unmappedTargetPolicy = ReportingPolicy.IGNORE)
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        uses = {BranchMapper.class})
 public interface FranchiseMapper {
     Franchise toFranchise(CreateFranchiseInput input);
     FranchisePayload toPayload(Franchise franchise);

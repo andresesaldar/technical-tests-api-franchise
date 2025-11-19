@@ -7,4 +7,5 @@ import reactor.core.publisher.Mono;
 
 public interface FranchiseDBRepository extends ReactiveMongoRepository<Franchise, String>, ReactiveQueryByExampleExecutor<Franchise> {
     Mono<Boolean> existsBySlug(String slug);
+    Mono<Franchise> findBySlug(String slug);
 }
