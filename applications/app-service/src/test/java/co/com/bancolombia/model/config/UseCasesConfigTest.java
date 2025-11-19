@@ -1,5 +1,6 @@
-package co.com.bancolombia.config;
+package co.com.bancolombia.model.config;
 
+import co.com.bancolombia.config.UseCasesConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;

@@ -1,5 +1,9 @@
 # Proyecto Base Implementando Clean Architecture
 
+<img src="ER_DIAGRAM.png" alt="ER Diagram" style="max-height:400px; width:auto;" />
+
+## USING MAPPER
+
 ## Antes de Iniciar
 
 Empezaremos por explicar los diferentes componentes del proyectos y partiremos de los componentes externos, continuando con los componentes core de negocio (dominio) y por último el inicio y configuración de la aplicación.
