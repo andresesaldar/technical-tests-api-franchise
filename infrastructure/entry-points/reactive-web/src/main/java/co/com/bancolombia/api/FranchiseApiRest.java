@@ -1,6 +1,7 @@
 package co.com.bancolombia.api;
 
 import co.com.bancolombia.api.input.CreateFranchiseInput;
+import co.com.bancolombia.api.input.UpdateFranchiseNameInput;
 import co.com.bancolombia.api.mapper.FranchiseMapper;
 import co.com.bancolombia.api.payload.FranchisePayload;
 import co.com.bancolombia.api.route.API_REST_ROUTES;
@@ -27,6 +28,17 @@ public class FranchiseApiRest {
             @RequestBody @Valid CreateFranchiseInput input
             ) {
         return franchiseUseCase.create(franchiseMapper.toFranchise(input))
+                .map(franchiseMapper::toPayload)
+                .map(FranchisePayload::response);
+    }
+
+    @PatchMapping(API_REST_ROUTES.FRANCHISE_SLUG_PARAM + API_REST_ROUTES.NAME)
+    @Operation(summary = "Update franchise name")
+    public Mono<FranchisePayload.Response> updateName(
+            @PathVariable("franchiseSlug") String slug,
+            @RequestBody @Valid UpdateFranchiseNameInput input
+    ) {
+        return franchiseUseCase.updateName(slug, input.getName())
                 .map(franchiseMapper::toPayload)
                 .map(FranchisePayload::response);
     }

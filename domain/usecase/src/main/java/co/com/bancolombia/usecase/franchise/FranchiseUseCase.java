@@ -20,4 +20,21 @@ public class FranchiseUseCase {
                 .switchIfEmpty(Mono.error(InvalidParamError.INVALID_FRANCHISE_SLUG.exception()))
                 .flatMap(ignore -> franchiseRepository.save(franchise));
     }
+
+    public Mono<Franchise> updateName(String slug, String newName) {
+        final String newSlug = newName.toLowerCase().replace(" ", "-");
+
+        return franchiseRepository.findBySlug(slug)
+                .switchIfEmpty(Mono.error(InvalidParamError.INVALID_FRANCHISE_SLUG.exception()))
+                .flatMap(franchise -> franchiseRepository.existsBySlug(newSlug)
+                    .filter(Boolean.FALSE::equals)
+                    .switchIfEmpty(Mono.error(InvalidParamError.INVALID_FRANCHISE_SLUG.exception()))
+                    .flatMap(ignored -> {
+
+                        franchise.setName(newName);
+                        franchise.setSlug(newSlug);
+
+                        return franchiseRepository.save(franchise);
+                    }));
+    }
 }

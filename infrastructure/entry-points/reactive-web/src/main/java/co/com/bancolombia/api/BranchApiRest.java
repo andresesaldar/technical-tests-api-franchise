@@ -1,6 +1,7 @@
 package co.com.bancolombia.api;
 
 import co.com.bancolombia.api.input.CreateBranchInput;
+import co.com.bancolombia.api.input.UpdateBranchNameInput;
 import co.com.bancolombia.api.mapper.BranchMapper;
 import co.com.bancolombia.api.mapper.ProductMapper;
 import co.com.bancolombia.api.payload.BranchPayload;
@@ -38,6 +39,18 @@ public class BranchApiRest {
             @RequestBody @Valid CreateBranchInput input
     ) {
         return branchUseCase.create(franchiseSlug, branchMapper.toBranch(input))
+                .map(branchMapper::toPayload)
+                .map(BranchPayload::response);
+    }
+
+    @PatchMapping(path = API_REST_ROUTES.SLUG_PARAM + API_REST_ROUTES.NAME)
+    @Operation(summary = "Update branch name")
+    public Mono<BranchPayload.Response> updateName(
+            @PathVariable("franchiseSlug") String franchiseSlug,
+            @PathVariable("slug") String slug,
+            @RequestBody @Valid UpdateBranchNameInput input
+    ) {
+        return branchUseCase.updateName(franchiseSlug, slug, input.getName())
                 .map(branchMapper::toPayload)
                 .map(BranchPayload::response);
     }

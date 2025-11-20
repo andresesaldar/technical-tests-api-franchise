@@ -1,5 +1,6 @@
 package co.com.bancolombia.api;
 import co.com.bancolombia.api.input.CreateProductInput;
+import co.com.bancolombia.api.input.UpdateProductNameInput;
 import co.com.bancolombia.api.input.UpdateProductStockInput;
 import co.com.bancolombia.api.mapper.ProductMapper;
 import co.com.bancolombia.api.payload.ProductPayload;
@@ -52,6 +53,20 @@ public class ProductApiRest {
                 .map(productMapper::toPayload)
                 .map(ProductPayload::response);
     }
+
+    @PatchMapping(path = API_REST_ROUTES.SLUG_PARAM + API_REST_ROUTES.NAME)
+    @Operation(summary = "Update product name")
+    public Mono<ProductPayload.Response> updateName(
+            @PathVariable("franchiseSlug") String franchiseSlug,
+            @PathVariable("branchSlug") String branchSlug,
+            @PathVariable("slug") String slug,
+            @RequestBody @Valid UpdateProductNameInput input
+    ) {
+        return productUseCase.updateName(franchiseSlug, branchSlug, slug, input.getName())
+                .map(productMapper::toPayload)
+                .map(ProductPayload::response);
+    }
+
 
     @DeleteMapping(path = API_REST_ROUTES.SLUG_PARAM)
     @Operation(summary = "Delete product from branch")

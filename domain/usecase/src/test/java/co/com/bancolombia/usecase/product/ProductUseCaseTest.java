@@ -267,4 +267,300 @@ class ProductUseCaseTest {
                 .expectNext(product)
                 .verifyComplete();
     }
+
+    @Test
+    void shouldDelete() {
+        final String franchiseSlug = "test-franchise";
+        final String franchiseId = "franchise-id";
+        final String branchSlug = "test-branch";
+        final String branchId = "branch-id";
+        final String slug = "test-product";
+        final Franchise franchise = Franchise.builder()
+                .id(franchiseId)
+                .slug(franchiseSlug)
+                .build();
+        final Branch branch = Branch.builder()
+                .id(branchId)
+                .slug(branchSlug)
+                .franchiseId(franchiseId)
+                .build();
+        final Product product = Product.builder()
+                .slug(slug)
+                .name("Test Product")
+                .branchId(branchId)
+                .build();
+
+        when(franchiseRepository.findBySlug(franchiseSlug))
+                .thenReturn(Mono.just(franchise));
+
+        when(branchRepository.findBySlugAndFranchiseId(branchSlug, franchiseId))
+                .thenReturn(Mono.just(branch));
+
+        when(productRepository.findBySlugAndBranchId(slug, branchId))
+                .thenReturn(Mono.just(product));
+
+        when(productRepository.delete(any(Product.class)))
+                .thenReturn(Mono.empty());
+
+        Mono<Void> result = productUseCase.delete(franchiseSlug, branchSlug, slug);
+
+        StepVerifier.create(result)
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldThrowInvalidParamError_whenDelete_withNonExistentFranchise() {
+        final String franchiseSlug = "non-existent-franchise";
+        final String branchSlug = "test-branch";
+        final String slug = "test-product";
+
+        when(franchiseRepository.findBySlug(franchiseSlug))
+                .thenReturn(Mono.empty());
+
+        Mono<Void> result = productUseCase.delete(franchiseSlug, branchSlug, slug);
+
+        StepVerifier.create(result)
+                .expectErrorMatches(
+                        throwable -> throwable instanceof InvalidParamException &&
+                                throwable.getMessage().equals(InvalidParamError.INVALID_FRANCHISE_SLUG.getMessage())
+                )
+                .verify();
+    }
+
+    @Test
+    void shouldThrowInvalidParamError_whenDelete_withNonExistentBranch() {
+        final String franchiseSlug = "test-franchise";
+        final String franchiseId = "franchise-id";
+        final String branchSlug = "non-existent-branch";
+        final String slug = "test-product";
+        final Franchise franchise = Franchise.builder()
+                .id(franchiseId)
+                .slug(franchiseSlug)
+                .build();
+
+        when(franchiseRepository.findBySlug(franchiseSlug))
+                .thenReturn(Mono.just(franchise));
+
+        when(branchRepository.findBySlugAndFranchiseId(branchSlug, franchiseId))
+                .thenReturn(Mono.empty());
+
+        Mono<Void> result = productUseCase.delete(franchiseSlug, branchSlug, slug);
+
+        StepVerifier.create(result)
+                .expectErrorMatches(
+                        throwable -> throwable instanceof InvalidParamException &&
+                                throwable.getMessage().equals(InvalidParamError.INVALID_BRANCH_SLUG.getMessage())
+                )
+                .verify();
+    }
+
+    @Test
+    void shouldThrowInvalidParamError_whenDelete_withNonExistentProduct() {
+        final String franchiseSlug = "test-franchise";
+        final String franchiseId = "franchise-id";
+        final String branchSlug = "test-branch";
+        final String branchId = "branch-id";
+        final String slug = "non-existent-product";
+        final Franchise franchise = Franchise.builder()
+                .id(franchiseId)
+                .slug(franchiseSlug)
+                .build();
+        final Branch branch = Branch.builder()
+                .id(branchId)
+                .slug(branchSlug)
+                .franchiseId(franchiseId)
+                .build();
+
+        when(franchiseRepository.findBySlug(franchiseSlug))
+                .thenReturn(Mono.just(franchise));
+
+        when(branchRepository.findBySlugAndFranchiseId(branchSlug, franchiseId))
+                .thenReturn(Mono.just(branch));
+
+        when(productRepository.findBySlugAndBranchId(slug, branchId))
+                .thenReturn(Mono.empty());
+
+        Mono<Void> result = productUseCase.delete(franchiseSlug, branchSlug, slug);
+
+        StepVerifier.create(result)
+                .expectErrorMatches(
+                        throwable -> throwable instanceof InvalidParamException &&
+                                throwable.getMessage().equals(InvalidParamError.INVALID_PRODUCT_SLUG.getMessage())
+                )
+                .verify();
+    }
+
+    @Test
+    void shouldUpdateName() {
+        final String franchiseSlug = "test-franchise";
+        final String franchiseId = "franchise-id";
+        final String branchSlug = "test-branch";
+        final String branchId = "branch-id";
+        final String slug = "old-product";
+        final String newName = "Updated Product Name";
+        final Franchise franchise = Franchise.builder()
+                .id(franchiseId)
+                .slug(franchiseSlug)
+                .build();
+        final Branch branch = Branch.builder()
+                .id(branchId)
+                .slug(branchSlug)
+                .build();
+        final Product existingProduct = Product.builder()
+                .slug(slug)
+                .name("Old Product")
+                .branchId(branchId)
+                .build();
+
+        when(franchiseRepository.findBySlug(franchiseSlug))
+                .thenReturn(Mono.just(franchise));
+
+        when(branchRepository.findBySlugAndFranchiseId(branchSlug, franchiseId))
+                .thenReturn(Mono.just(branch));
+
+        when(productRepository.findBySlugAndBranchId(slug, branchId))
+                .thenReturn(Mono.just(existingProduct));
+
+        when(productRepository.existsBySlugAndBranchId("updated-product-name", branchId))
+                .thenReturn(Mono.just(false));
+
+        when(productRepository.save(any(Product.class)))
+                .thenAnswer(p -> Mono.just((Product) p.getArgument(0)));
+
+        Mono<Product> result = productUseCase.updateName(franchiseSlug, branchSlug, slug, newName);
+
+        StepVerifier.create(result)
+                .expectNextMatches(p ->
+                        p.getName().equals(newName) &&
+                        p.getSlug().equals("updated-product-name"))
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldThrowInvalidParamError_whenUpdateName_withNonExistentFranchise() {
+        final String franchiseSlug = "non-existent-franchise";
+        final String branchSlug = "branch-slug";
+        final String slug = "product-slug";
+        final String newName = "Updated Name";
+
+        when(franchiseRepository.findBySlug(franchiseSlug))
+                .thenReturn(Mono.empty());
+
+        Mono<Product> result = productUseCase.updateName(franchiseSlug, branchSlug, slug, newName);
+
+        StepVerifier.create(result)
+                .expectErrorMatches(
+                        throwable -> throwable instanceof InvalidParamException &&
+                                throwable.getMessage().equals(InvalidParamError.INVALID_FRANCHISE_SLUG.getMessage())
+                )
+                .verify();
+    }
+
+    @Test
+    void shouldThrowInvalidParamError_whenUpdateName_withNonExistentBranch() {
+        final String franchiseSlug = "test-franchise";
+        final String franchiseId = "franchise-id";
+        final String branchSlug = "non-existent-branch";
+        final String slug = "product-slug";
+        final String newName = "Updated Name";
+        final Franchise franchise = Franchise.builder()
+                .id(franchiseId)
+                .slug(franchiseSlug)
+                .build();
+
+        when(franchiseRepository.findBySlug(franchiseSlug))
+                .thenReturn(Mono.just(franchise));
+
+        when(branchRepository.findBySlugAndFranchiseId(branchSlug, franchiseId))
+                .thenReturn(Mono.empty());
+
+        Mono<Product> result = productUseCase.updateName(franchiseSlug, branchSlug, slug, newName);
+
+        StepVerifier.create(result)
+                .expectErrorMatches(
+                        throwable -> throwable instanceof InvalidParamException &&
+                                throwable.getMessage().equals(InvalidParamError.INVALID_BRANCH_SLUG.getMessage())
+                )
+                .verify();
+    }
+
+    @Test
+    void shouldThrowInvalidParamError_whenUpdateName_withNonExistentProduct() {
+        final String franchiseSlug = "test-franchise";
+        final String franchiseId = "franchise-id";
+        final String branchSlug = "test-branch";
+        final String branchId = "branch-id";
+        final String slug = "non-existent-product";
+        final String newName = "Updated Name";
+        final Franchise franchise = Franchise.builder()
+                .id(franchiseId)
+                .slug(franchiseSlug)
+                .build();
+        final Branch branch = Branch.builder()
+                .id(branchId)
+                .slug(branchSlug)
+                .build();
+
+        when(franchiseRepository.findBySlug(franchiseSlug))
+                .thenReturn(Mono.just(franchise));
+
+        when(branchRepository.findBySlugAndFranchiseId(branchSlug, franchiseId))
+                .thenReturn(Mono.just(branch));
+
+        when(productRepository.findBySlugAndBranchId(slug, branchId))
+                .thenReturn(Mono.empty());
+
+        Mono<Product> result = productUseCase.updateName(franchiseSlug, branchSlug, slug, newName);
+
+        StepVerifier.create(result)
+                .expectErrorMatches(
+                        throwable -> throwable instanceof InvalidParamException &&
+                                throwable.getMessage().equals(InvalidParamError.INVALID_PRODUCT_SLUG.getMessage())
+                )
+                .verify();
+    }
+
+    @Test
+    void shouldThrowInvalidParamError_whenUpdateName_withExistentNewSlug() {
+        final String franchiseSlug = "test-franchise";
+        final String franchiseId = "franchise-id";
+        final String branchSlug = "test-branch";
+        final String branchId = "branch-id";
+        final String slug = "old-product";
+        final String newName = "Existing Product";
+        final Franchise franchise = Franchise.builder()
+                .id(franchiseId)
+                .slug(franchiseSlug)
+                .build();
+        final Branch branch = Branch.builder()
+                .id(branchId)
+                .slug(branchSlug)
+                .build();
+        final Product existingProduct = Product.builder()
+                .slug(slug)
+                .name("Old Product")
+                .branchId(branchId)
+                .build();
+
+        when(franchiseRepository.findBySlug(franchiseSlug))
+                .thenReturn(Mono.just(franchise));
+
+        when(branchRepository.findBySlugAndFranchiseId(branchSlug, franchiseId))
+                .thenReturn(Mono.just(branch));
+
+        when(productRepository.findBySlugAndBranchId(slug, branchId))
+                .thenReturn(Mono.just(existingProduct));
+
+        when(productRepository.existsBySlugAndBranchId("existing-product", branchId))
+                .thenReturn(Mono.just(true));
+
+        Mono<Product> result = productUseCase.updateName(franchiseSlug, branchSlug, slug, newName);
+
+        StepVerifier.create(result)
+                .expectErrorMatches(
+                        throwable -> throwable instanceof InvalidParamException &&
+                                throwable.getMessage().equals(InvalidParamError.INVALID_PRODUCT_SLUG.getMessage())
+                )
+                .verify();
+    }
 }

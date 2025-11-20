@@ -72,4 +72,74 @@ class FranchiseUseCaseTest {
                 .verify();
     }
 
+    @Test
+    void shouldUpdateName() {
+        final String slug = "old-franchise";
+        final String newName = "Updated Franchise Name";
+        final Franchise existingFranchise = Franchise.builder()
+                .slug(slug)
+                .name("Old Franchise")
+                .build();
+
+        when(franchiseRepository.findBySlug(slug))
+                .thenReturn(Mono.just(existingFranchise));
+
+        when(franchiseRepository.existsBySlug("updated-franchise-name"))
+                .thenReturn(Mono.just(false));
+
+        when(franchiseRepository.save(any(Franchise.class)))
+                .thenAnswer(p -> Mono.just((Franchise) p.getArgument(0)));
+
+        Mono<Franchise> result = franchiseUseCase.updateName(slug, newName);
+
+        StepVerifier.create(result)
+                .expectNextMatches(f ->
+                        f.getName().equals(newName) &&
+                        f.getSlug().equals("updated-franchise-name"))
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldThrowInvalidParamError_whenUpdateName_withNonExistentSlug() {
+        final String slug = "non-existent-franchise";
+        final String newName = "Updated Name";
+
+        when(franchiseRepository.findBySlug(slug))
+                .thenReturn(Mono.empty());
+
+        Mono<Franchise> result = franchiseUseCase.updateName(slug, newName);
+
+        StepVerifier.create(result)
+                .expectErrorMatches(
+                        throwable -> throwable instanceof InvalidParamException &&
+                                throwable.getMessage().equals(InvalidParamError.INVALID_FRANCHISE_SLUG.getMessage())
+                )
+                .verify();
+    }
+
+    @Test
+    void shouldThrowInvalidParamError_whenUpdateName_withExistentNewSlug() {
+        final String slug = "old-franchise";
+        final String newName = "Existing Franchise";
+        final Franchise existingFranchise = Franchise.builder()
+                .slug(slug)
+                .name("Old Franchise")
+                .build();
+
+        when(franchiseRepository.findBySlug(slug))
+                .thenReturn(Mono.just(existingFranchise));
+
+        when(franchiseRepository.existsBySlug("existing-franchise"))
+                .thenReturn(Mono.just(true));
+
+        Mono<Franchise> result = franchiseUseCase.updateName(slug, newName);
+
+        StepVerifier.create(result)
+                .expectErrorMatches(
+                        throwable -> throwable instanceof InvalidParamException &&
+                                throwable.getMessage().equals(InvalidParamError.INVALID_FRANCHISE_SLUG.getMessage())
+                )
+                .verify();
+    }
+
 }

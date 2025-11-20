@@ -51,6 +51,22 @@ public class ProductUseCase {
                         .flatMap(productRepository::delete));
     }
 
+    public Mono<Product> updateName(String franchiseSlug, String branchSlug, String slug, String newName) {
+        final String newSlug = newName.toLowerCase().replace(" ", "-");
+
+        return validateFranchiseAndBranch(franchiseSlug, branchSlug)
+                .flatMap(branch -> productRepository.findBySlugAndBranchId(slug, branch.getId()))
+                .switchIfEmpty(Mono.error(InvalidParamError.INVALID_PRODUCT_SLUG.exception()))
+                .flatMap(product -> productRepository.existsBySlugAndBranchId(newSlug, product.getBranchId())
+                        .filter(Boolean.FALSE::equals)
+                        .switchIfEmpty(Mono.error(InvalidParamError.INVALID_PRODUCT_SLUG.exception()))
+                        .flatMap(ignored -> {
+                            product.setName(newName);
+                            product.setSlug(newSlug);
+                            return productRepository.save(product);
+                        }));
+    }
+
     public Flux<Product> getProductsAvailability(String franchiseSlug, Integer page, Integer pageSize) {
         return franchiseRepository.findBySlug(franchiseSlug)
                 .switchIfEmpty(Mono.error(InvalidParamError.INVALID_FRANCHISE_SLUG.exception()))

@@ -8,6 +8,7 @@ public abstract class API_REST_ROUTES {
     public static final String BRANCHES = "/branches";
 
     public static final String STOCK = "/stock";
+    public static final String NAME = "/name";
     public static final String AVAILABILITY = "/availability";
 
     public static final String SLUG_PARAM = "/{slug}";
