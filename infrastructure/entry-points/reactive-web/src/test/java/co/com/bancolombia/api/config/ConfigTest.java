@@ -29,8 +29,12 @@ class ConfigTest {
 
     @Test
     void corsConfigurationShouldAllowOrigins() {
-        webTestClient.put()
-                .uri(API_REST_ROUTES.API + API_REST_ROUTES.PRODUCTS + API_REST_ROUTES.SLUG_PARAM + API_REST_ROUTES.STOCK, "example-slug")
+        webTestClient.patch()
+                .uri(API_REST_ROUTES.API + API_REST_ROUTES.FRANCHISES
+                        + API_REST_ROUTES.FRANCHISE_SLUG_PARAM + API_REST_ROUTES.BRANCHES
+                        + API_REST_ROUTES.BRANCH_SLUG_PARAM + API_REST_ROUTES.PRODUCTS
+                        + API_REST_ROUTES.SLUG_PARAM + API_REST_ROUTES.STOCK,
+                        "example-franchise-slug", "example-branch-slug", "example-slug")
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectHeader().valueEquals("Content-Security-Policy",

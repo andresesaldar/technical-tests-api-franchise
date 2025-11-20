@@ -13,11 +13,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 class ProductUseCaseTest {
@@ -238,5 +238,33 @@ class ProductUseCaseTest {
                 .expectErrorMatches(e -> e instanceof InvalidParamException
                         && e.getMessage().equals(InvalidParamError.INVALID_PRODUCT_SLUG.getMessage()))
                 .verify();
+    }
+
+    @Test
+    void shouldGetProductsAvailability() {
+        final Product product = Product.builder()
+                .name("Test Product")
+                .branchSlug("test-branch")
+                .build();
+        final Integer page = 0;
+        final Integer pageSize = 10;
+        final String franchiseSlug = "test-franchise";
+        final String franchiseId = "franchise-id";
+        final Franchise franchise = Franchise.builder()
+                .id(franchiseId)
+                .slug(franchiseSlug)
+                .build();
+
+        when(franchiseRepository.findBySlug(anyString()))
+                .thenReturn(Mono.just(franchise));
+
+        when(productRepository.findProductsWithBranchByFranchiseIdSortByStockDesc(anyString(), anyInt(), anyInt()))
+                .thenReturn(Flux.just(product));
+
+        Flux<Product> result = productUseCase.getProductsAvailability(franchiseSlug, page, pageSize);
+
+        StepVerifier.create(result)
+                .expectNext(product)
+                .verifyComplete();
     }
 }

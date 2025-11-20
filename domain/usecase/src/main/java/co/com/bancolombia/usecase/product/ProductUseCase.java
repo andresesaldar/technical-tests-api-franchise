@@ -7,6 +7,7 @@ import co.com.bancolombia.model.franchise.gateways.FranchiseRepository;
 import co.com.bancolombia.model.product.Product;
 import co.com.bancolombia.model.product.gateways.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
@@ -48,6 +49,13 @@ public class ProductUseCase {
                 .flatMap(branch -> productRepository.findBySlugAndBranchId(slug, branch.getId())
                         .switchIfEmpty(Mono.error(InvalidParamError.INVALID_PRODUCT_SLUG.exception()))
                         .flatMap(productRepository::delete));
+    }
+
+    public Flux<Product> getProductsAvailability(String franchiseSlug, Integer page, Integer pageSize) {
+        return franchiseRepository.findBySlug(franchiseSlug)
+                .switchIfEmpty(Mono.error(InvalidParamError.INVALID_FRANCHISE_SLUG.exception()))
+                .flatMapMany(franchise ->
+                        productRepository.findProductsWithBranchByFranchiseIdSortByStockDesc(franchise.getId(), page, pageSize));
     }
 
     private Mono<Branch> validateFranchiseAndBranch(String franchiseSlug, String slug) {

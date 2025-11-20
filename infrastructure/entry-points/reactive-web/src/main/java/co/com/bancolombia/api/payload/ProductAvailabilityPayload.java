@@ -6,23 +6,22 @@ import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 
+import java.util.List;
+
 @Value
 @Builder
 @Jacksonized
-public class ProductPayload {
+public class ProductAvailabilityPayload {
     String slug;
     String name;
     Long stock;
+    String branch;
 
     @ApiResponse
-    @Tag(name = "ResponsePayload<ProductPayload>")
-    public static class Response extends ResponsePayload<ProductPayload> {
-        public Response(ProductPayload data) {
+    @Tag(name = "ResponsePayload<List<ProductAvailabilityPayload>>")
+    public static class ListResponse extends  ResponsePayload<List<ProductAvailabilityPayload>> {
+        public ListResponse(List<ProductAvailabilityPayload> data) {
             super(data);
         }
-    }
-
-    public ProductPayload.Response response() {
-        return new ProductPayload.Response(this);
     }
 }

@@ -6,10 +6,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Pageable;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 class ProductRepositoryAdapterTest {
@@ -65,6 +67,19 @@ class ProductRepositoryAdapterTest {
                 .thenReturn(Mono.empty());
 
         StepVerifier.create(adapter.delete(product))
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldFindProductsWithBranchByFranchiseIdSortByStockDesc() {
+        final String franchiseId = "franchise-123";
+        final Integer page = 0;
+        final Integer pageSize = 10;
+
+        when(repository.findProductsWithBranchByFranchiseIdSortByStockDesc(anyString(), any(Pageable.class)))
+                .thenReturn(Flux.empty());
+
+        StepVerifier.create(adapter.findProductsWithBranchByFranchiseIdSortByStockDesc(franchiseId, page, pageSize))
                 .verifyComplete();
     }
 

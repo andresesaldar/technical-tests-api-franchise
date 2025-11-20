@@ -16,4 +16,6 @@ public class Product {
     private String name;
     private Long stock;
     private String branchId;
+    @Builder.Default
+    private String branchSlug = null;
 }
